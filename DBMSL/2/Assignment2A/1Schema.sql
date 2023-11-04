@@ -21,6 +21,7 @@ CREATE TABLE Employee(
     Emp_salary INT,
     Emp_JoinDate DATE,
     FOREIGN KEY(Dept_id) REFERENCES Dept(Dept_id)
+    ON DELETE CASCADE
 );
 
 CREATE TABLE Project(
@@ -31,4 +32,5 @@ CREATE TABLE Project(
     Proj_cost INT,
     Proj_year INT,
     FOREIGN KEY(Dept_id) REFERENCES Dept(Dept_id)
+    ON DELETE CASCADE
 );
