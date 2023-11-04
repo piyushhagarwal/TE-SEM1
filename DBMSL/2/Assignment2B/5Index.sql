@@ -1,0 +1,2 @@
+-- An index is a database object that improves the speed of data retrieval operations on a database table. It provides a quick lookup for specific columns.
+CREATE INDEX idx_student_branch ON Student(S_branch);
