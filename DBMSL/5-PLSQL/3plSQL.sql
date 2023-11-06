@@ -7,10 +7,13 @@
 -- marks899and 825  category  is  Higher  Second 
 -- Class.
 
+
+-- Creating a Procedure
 DELIMITER $$
 CREATE PROCEDURE proc_Grade(IN student_name VARCHAR(20))
 BEGIN
     DECLARE student_marks INT;
+    Declare EXIT HANDLER FOR NOT FOUND SELECT 'No Student Record Found' AS 'Error';
 
     SELECT stud_marks INTO student_marks FROM StudentMarks WHERE stud_name = student_name;
 
@@ -21,6 +24,27 @@ BEGIN
     ELSEIF student_marks <= 899 AND student_marks >= 825 THEN
         INSERT INTO Category VALUES(student_name,'Second Class');
     END IF;
+END $$
+DELIMITER ;
+
+
+-- Creating a Function
+DELIMITER $$
+CREATE FUNCTION func_Grade(student_marks)
+RETURNS VARCHAR(20)
+DETERMINISTIC
+BEGIN
+    DECLARE Student_Grade VARCHAR(20) DEFAULT 'PASS';
+
+    IF student_marks <= 1500 AND student_marks >= 990 THEN
+        SET Student_Grade = 'Distinction';
+    ELSEIF student_marks <= 989 AND student_marks >= 900 THEN
+        SET Student_Grade = 'First Class';
+    ELSEIF student_marks <= 899 AND student_marks >= 825 THEN
+        SET Student_Grade = 'Second Class';
+    END IF;
+
+    RETURN Student_Grade;
 END $$
 DELIMITER ;
 
