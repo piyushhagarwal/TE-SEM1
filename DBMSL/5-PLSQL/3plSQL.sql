@@ -13,7 +13,7 @@ DELIMITER $$
 CREATE PROCEDURE proc_Grade(IN student_name VARCHAR(20))
 BEGIN
     DECLARE student_marks INT;
-    Declare EXIT HANDLER FOR NOT FOUND SELECT 'No Student Record Found' AS 'Error';
+    DECLARE EXIT HANDLER FOR NOT FOUND SELECT 'No Student Record Found' AS 'Error';
 
     SELECT stud_marks INTO student_marks FROM StudentMarks WHERE stud_name = student_name;
 
@@ -30,7 +30,7 @@ DELIMITER ;
 
 -- Creating a Function
 DELIMITER $$
-CREATE FUNCTION func_Grade(student_marks)
+CREATE FUNCTION func_Grade(student_marks INT)
 RETURNS VARCHAR(20)
 DETERMINISTIC
 BEGIN

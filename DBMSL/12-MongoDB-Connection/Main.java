@@ -5,22 +5,22 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates; 
+import com.mongodb.client.model.Updates;
 
-        port org.bson.*;
-        
-        // 
+import org.bson.*;
+
 public class MongoDb {
 	public static void main(String[] args) {
 
 		// Create a mongo client instance
-		// For Authentication based 
-		// MongoClientURI uri = new MongoClientURI("mongodb://rohan:rohandoshi21@127.0.0.1:27017/?authSource=myDb");
+		// For Authentication based
+		// MongoClientURI uri = new
+		// MongoClientURI("mongodb://piyush:piyush@127.0.0.1:27017/?authSource=myDb");
 		MongoClientURI uri = new MongoClientURI("mongodb://127.0.0.1:27017");
-		MongoClient mongoClient = new MongoClient (uri); 
+		MongoClient mongoClient = new MongoClient(uri);
 
+		MongoDatabase database = mongoClient.getDatabase("myDb");
 
-    
 		// If collection is already present gives error
 		database.createCollection("test");
 
@@ -44,7 +44,7 @@ public class MongoDb {
 		collection.insertOne(doc);
 
 		// Update
-		collection.updateOne(Filters.eq("name", "Rohan"), Updates.set("age", 21));
+		collection.updateOne(Filters.eq("name", "Piyush"), Updates.set("age", 21));
 
 		// Delete
 		collection.deleteMany(Filters.and(Filters.eq("name", "Tanmya"), Filters.eq("age", 18)));
