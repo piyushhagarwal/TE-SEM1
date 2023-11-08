@@ -9,7 +9,7 @@ import com.mongodb.client.model.Updates;
 
 import org.bson.*;
 
-public class MongoDb {
+class MongoDb {
 	public static void main(String[] args) {
 
 		// Create a mongo client instance
