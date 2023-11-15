@@ -47,60 +47,78 @@ public class Pass2 {
 
             String line;
             while ((line = intermediateCodeFile.readLine()) != null) {
+                // Tokenize the line to extract words
                 String[] words = line.replace(",", "").replace("&", "").split("\\s+");
 
-                currentMacroIndex++;
-                argumentTable.clear();
-                int[] macroInfo = macroNameTable.get(words[0]);
-                int positionalParameterCount = macroInfo[0];
-                int keywordParameterCount = macroInfo[1];
+                if (!macroNameTable.containsKey(words[0])) {
+                    // If not a macro, append the line to the output
+                    output += line + "\n";
+                } else {
+                    currentMacroIndex++;
+                    argumentTable.clear();
+                    int[] macroInfo = macroNameTable.get(words[0]);
+                    int positionalParameterCount = macroInfo[0];
+                    int keywordParameterCount = macroInfo[1];
 
-                for (int i = 1; i <= positionalParameterCount; i++) {
-                    argumentTable.put(i, words[i]);
-                }
-
-                for (int i = positionalParameterCount + 1; i <= positionalParameterCount
-                        + keywordParameterCount; i++) {
-                    if (words[i].split("=").length == 1) {
-                        argumentTable.put(i, keywordParameterDefaultTable.get(words[i].split("=")[0]));
-                    } else {
-                        argumentTable.put(i, words[i].split("=")[1]);
+                    // Populate argument table with positional parameters
+                    for (int i = 1; i <= positionalParameterCount; i++) {
+                        argumentTable.put(i, words[i]);
                     }
-                }
 
-                String macroDefinitionLine;
-                while ((macroDefinitionLine = macroDefinitionTableFile.readLine()) != null) {
-                    String[] macroDefinitionWords = macroDefinitionLine.split("\\s+");
-
-                    if (!macroDefinitionWords[0].equals("MEND")) {
-                        output += macroDefinitionWords[0] + "\t";
-
-                        for (int i = 1; i < macroDefinitionWords.length; i++) {
-                            if (!macroDefinitionWords[i].contains("=")) {
-                                int parameterIndex = Integer.parseInt(macroDefinitionWords[i].substring(3, 4));
-                                output += argumentTable.get(parameterIndex) + "\t";
-                            } else {
-                                output += macroDefinitionWords[i] + "\t";
-                            }
+                    // Populate argument table with keyword parameters and defaults
+                    for (int i = positionalParameterCount + 1; i <= positionalParameterCount
+                            + keywordParameterCount; i++) {
+                        if (words[i].split("=").length == 1) {
+                            argumentTable.put(i, keywordParameterDefaultTable.get(words[i].split("=")[0]));
+                        } else {
+                            argumentTable.put(i, words[i].split("=")[1]);
                         }
+                    }
 
-                        output += "\n";
-                    } else {
-                        break;
+                    String macroDefinitionLine;
+                    while ((macroDefinitionLine = macroDefinitionTableFile.readLine()) != null) {
+                        String[] macroDefinitionWords = macroDefinitionLine.split("\\s+");
+
+                        if (!macroDefinitionWords[0].equals("MEND")) {
+                            // If not the end of the macro, process the macro definition
+                            output += macroDefinitionWords[0] + "\t";
+
+                            for (int i = 1; i < macroDefinitionWords.length; i++) {
+                                if (!macroDefinitionWords[i].contains("=")) {
+                                    // If not a keyword parameter, replace with corresponding argument
+                                    int parameterIndex = Integer.parseInt(macroDefinitionWords[i].substring(3, 4));
+                                    output += argumentTable.get(parameterIndex) + "\t";
+                                } else {
+                                    // If a keyword parameter, append as is
+                                    output += macroDefinitionWords[i] + "\t";
+                                }
+                            }
+
+                            output += "\n";
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
 
+            // Print the final output
             System.out.println(output);
 
         } catch (IOException e) {
+            // Handle IOException
             e.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
+        // Create an instance of Pass2
         Pass2 pass2 = new Pass2();
+
+        // Read tables from files
         pass2.readTables();
+
+        // Process the intermediate code
         pass2.process();
     }
 }
