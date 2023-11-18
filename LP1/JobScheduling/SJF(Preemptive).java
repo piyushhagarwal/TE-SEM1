@@ -64,8 +64,8 @@ class SJFPreemptive {
                 currentTask.burst_time -= quantum;
                 currentTime += quantum;
             } else {
-                currentTask.waiting_time = currentTime - currentTask.arrival_time;
                 currentTime += currentTask.burst_time;
+                currentTask.waiting_time = currentTime - currentTask.arrival_time;
                 currentTask.burst_time = 0;
                 currentTask.completion_time = currentTime;
                 currentTask.turnaround_time = currentTask.completion_time - currentTask.arrival_time;
@@ -109,5 +109,7 @@ class SJFPreemptive {
         tasks.add(new Task("T4", 3, 6));
         tasks.add(new Task("T5", 4, 4));
         SJFPreemptiveAlgo(tasks, 3);
+
+        // Time Quantum is 3
     }
 }
