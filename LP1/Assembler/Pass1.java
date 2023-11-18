@@ -145,9 +145,20 @@ public class Pass1 {
                     break;
                 }
 
-                String words[] = line.trim().split("\\s+");
+                String words[] = line.split("\\s+");
                 // trim() removes leading and trailing spaces
                 // split("\\s+") splits the string at one or more spaces
+
+                System.out.println(words.length);
+
+                // Print the words array
+                for (String word : words) {
+                    if (word.equals("")) {
+                        System.out.println("Empty String");
+                    } else {
+                        System.out.println(word);
+                    }
+                }
 
             }
 
@@ -161,26 +172,26 @@ public class Pass1 {
     }
 
     public static void main(String args[]) {
-        // Tests to write all the functions
+        // // Tests to write all the functions
 
-        // Test updateSymbolTab
+        // // Test updateSymbolTab
         Pass1 pass1 = new Pass1();
-        String[] pair = { "A", "5" };
-        pass1.symbolTab.add(pair);
-        String[] pair2 = { "B", "10" };
-        pass1.symbolTab.add(pair2);
-        String[] pair3 = { "C", "15" };
-        pass1.symbolTab.add(pair3);
-        String[] pair4 = { "D", "20" };
-        pass1.symbolTab.add(pair4);
-        String[] pair5 = { "E", "25" };
-        pass1.symbolTab.add(pair5);
+        // String[] pair = { "A", "5" };
+        // pass1.symbolTab.add(pair);
+        // String[] pair2 = { "B", "10" };
+        // pass1.symbolTab.add(pair2);
+        // String[] pair3 = { "C", "15" };
+        // pass1.symbolTab.add(pair3);
+        // String[] pair4 = { "D", "20" };
+        // pass1.symbolTab.add(pair4);
+        // String[] pair5 = { "E", "25" };
+        // pass1.symbolTab.add(pair5);
 
-        // Test getSymbolLC
-        System.out.println(pass1.getSymbolLC("G"));
+        // // Test getSymbolLC
+        // System.out.println(pass1.getSymbolLC("G"));
 
-        // Test getSymbolIndex
-        System.out.println(pass1.getSymbolIndex("A"));
+        // // Test getSymbolIndex
+        // System.out.println(pass1.getSymbolIndex("A"));
 
         pass1.process();
 
