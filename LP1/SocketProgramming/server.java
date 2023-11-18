@@ -1,63 +1,60 @@
 package LP1.SocketProgramming;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-class MultiThreadedEchoServer {
-    public static void main(String[] args) {
+public class server {
+    public static void main(String args[]) {
         int port = 8888;
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
 
-        try {
-            ServerSocket serverSocket = new ServerSocket(port);
-            System.out.println("Server started and is listening on port " + port);
+            System.out.println("Server started and running on port " + port);
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected from " + clientSocket.getInetAddress());
+                System.out.println(clientSocket.getInetAddress());
 
-                // Create a new thread to handle the client
-                Thread clientThread = new Thread(new ClientHandler(clientSocket));
-                clientThread.start();
+                ClientThread clientThread = new ClientThread(clientSocket); // Create a new thread for each client
+                clientThread.start(); // Start the thread
+
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
+}
 
-    private static class ClientHandler implements Runnable {
-        private Socket clientSocket;
+class ClientThread extends Thread {
+    private Socket clientSocket;
 
-        public ClientHandler(Socket socket) {
-            this.clientSocket = socket;
-        }
+    public ClientThread(Socket clientSocket) {
+        this.clientSocket = clientSocket;
+    }
 
-        @Override
-        public void run() {
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
+    @Override
+    public void run() {
+        try {
+            // Read from the client
+            BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-                String inputLine;
-                while ((inputLine = reader.readLine()) != null) {
-                    System.out.println("Received from client: " + inputLine);
+            // Write to the client
+            PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
 
-                    // Echo the message back to the client
-                    writer.println("Server: " + inputLine);
+            String inputLine = reader.readLine(); // Read the client's message
 
-                    if (inputLine.equals("bye")) {
-                        break;
-                    }
-                }
+            System.out.println("Recieved from client " + inputLine);
 
-                System.out.println("Client disconnected");
-                clientSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            writer.println("Server: " + inputLine); // Send the message back to the client
+
+            System.out.println("Client disconnected");
+
+            clientSocket.close();
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 }

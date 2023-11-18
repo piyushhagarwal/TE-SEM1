@@ -1,13 +1,11 @@
 package LP1.SocketProgramming;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Scanner;
 
-class EchoClient {
+public class client {
     public static void main(String[] args) {
         String serverAddress = "localhost";
         int port = 8888;
@@ -16,27 +14,22 @@ class EchoClient {
             Socket socket = new Socket(serverAddress, port);
             System.out.println("Connected to server on port " + port);
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-            Scanner scanner = new Scanner(System.in);
+            String messageToBeSent = "Hello I am Client 1";
 
-            while (true) {
-                System.out.print("Enter message (type 'bye' to exit): ");
-                String message = scanner.nextLine();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // Read from the
+                                                                                                        // server
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true); // Write to the server
 
-                writer.println(message);
+            writer.println(messageToBeSent); // Send the message to the server
 
-                if (message.equals("bye")) {
-                    break;
-                }
+            String serverResponse = reader.readLine(); // Read the server's response
 
-                String response = reader.readLine();
-                System.out.println("Server response: " + response);
-            }
+            System.out.println("Server response " + serverResponse);
 
             socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 }
