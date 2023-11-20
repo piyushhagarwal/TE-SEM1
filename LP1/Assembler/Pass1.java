@@ -1,117 +1,82 @@
 package LP1.Assembler;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public class Pass1 {
-
-    // Intialize data structures
-    // 1. Symbol table
-    private List<String[]> symbolTab; // Eg: [["A", "5"], ["B", "10"]]
-    private int lc; // Location counter
-
-    // 2. Literal table
-    private List<String[]> literalTab;
-    private int literalIndex;
-
-    // 3. Pool table
-    private List<Integer> poolTab;
-    private int poolIndex;
-
-    // Create OPCODE table
-    private final Map<String, String> OPTAB = new HashMap<>();
+class Pass1 {
 
     // Note that we have to create a block to insert or do any operation on the Maps
-    {
-        OPTAB.put("STOP", "(IS,00)");
-        OPTAB.put("ADD", "(IS,01)");
-        OPTAB.put("SUB", "(IS,02)");
-        OPTAB.put("MUL", "(IS,03)");
-        OPTAB.put("MOVER", "(IS,04)");
-        OPTAB.put("MOVEM", "(IS,05)");
-        OPTAB.put("COMP", "(IS,06)");
-        OPTAB.put("BC", "(IS,07)");
-        OPTAB.put("DIV", "(IS,08)");
-        OPTAB.put("READ", "(IS,09)");
-        OPTAB.put("PRINT", "(IS,10)");
-    }
+    static HashMap<String, String> OPTAB = new HashMap<>() { // Create OPCODE table
+        {
+            put("STOP", "(IS,00)");
+            put("ADD", "(IS,01)");
+            put("SUB", "(IS,02)");
+            put("MUL", "(IS,03)");
+            put("MOVER", "(IS,04)");
+            put("MOVEM", "(IS,05)");
+            put("COMP", "(IS,06)");
+            put("BC", "(IS,07)");
+            put("DIV", "(IS,08)");
+            put("READ", "(IS,09)");
+            put("PRINT", "(IS,10)");
+        }
+    };
 
     // Create Register table
-    private final Map<String, String> REGISTER = new HashMap<>();
-
-    {
-        REGISTER.put("AREG", "(1)");
-        REGISTER.put("BREG", "(2)");
-        REGISTER.put("CREG", "(3)");
-        REGISTER.put("DREG", "(4)");
-    }
+    static HashMap<String, String> REG = new HashMap<>() {
+        {
+            put("AREG", "(1)");
+            put("BREG", "(2)");
+            put("CREG", "(3)");
+            put("DREG", "(4)");
+        }
+    };
 
     // Create Condition Code table
+    static HashMap<String, String> CC = new HashMap<>() {
+        {
+            put("LT", "(1)");
+            put("LE", "(2)");
+            put("EQ", "(3)");
+            put("GT", "(4)");
+            put("GE", "(5)");
+            put("ANY", "(6)");
+        }
+    };
 
-    private final Map<String, String> CC = new HashMap<>();
+    public static int lc = 0; // Location counter
 
-    {
-        CC.put("LT", "(1)");
-        CC.put("LE", "(2)");
-        CC.put("EQ", "(3)");
-        CC.put("GT", "(4)");
-        CC.put("GE", "(5)");
-        CC.put("ANY", "(6)");
-    }
+    // Intialize data structures
 
-    public Pass1() {
+    // 1. Symbol table
+    public static ArrayList<String[]> symbolTable = new ArrayList<>(); // Eg: [["A", "5"], ["B", "10"]]
 
-        symbolTab = new ArrayList<>();
-        lc = 0;
+    // 2. Literal table
+    public static ArrayList<String[]> literalTable = new ArrayList<>();
+    public static int literalIndex = 0;
 
-        literalTab = new ArrayList<>();
-        literalIndex = 0;
-
-        poolTab = new ArrayList<>();
-        poolTab.add(0);
-        poolIndex = 0;
-
-    }
+    // 3. Pool table
+    public static ArrayList<Integer> poolTable = new ArrayList<>();
+    public static int poolIndex = 0;
 
     // This function updates the symbol table (symtab) with the information provided
     // in the pair parameter.
     // It iterates through the existing entries in the symbol table and checks if
     // there is an entry with the same symbol (represented by pair[0]).
     // If a matching symbol is found, it updates the associated location information
-    // (i[1]) with the new value (pair[1]).
-
-    public void updateSymbolTab(String[] pair) {
-        for (String[] stringArray : symbolTab) {
-            if (stringArray[0].equals(pair[0])) { // Note: use equals(), not "==" because we want to compare the content
-                                                  // not the reference
-                stringArray[1] = pair[1];
-                break;
+    // (i[1]) with the new value (pair[1]) otherwise add the new symbol to the
+    // table.
+    public static void updateSymtab(String[] pair) {
+        for (String[] i : symbolTable) {
+            if (i[0].equals(pair[0])) {
+                i[1] = pair[1];
+                return;
             }
         }
-    }
-
-    // This function retrieves the location counter (LC) associated with a given
-    // symbol from the symbol table.
-    // It iterates through the symbol table and checks if there is an entry with the
-    // provided symbol.
-    // If a matching symbol is found, it returns the corresponding location counter
-    // as an integer.
-    // If no matching symbol is found, it returns -1 to indicate that the symbol is
-    // not in the symbol table.
-
-    public int getSymbolLC(String symbol) {
-        for (String[] stringArray : symbolTab) {
-            if (stringArray[0].equals(symbol)) {
-                return Integer.parseInt(stringArray[1]);
-            }
-        }
-        return -1;
+        // If the symbol is not already present
+        symbolTable.add(pair);
     }
 
     // This function retrieves the position (index) of a given symbol in the symbol
@@ -122,78 +87,168 @@ public class Pass1 {
     // in the symbol table.
     // If no matching symbol is found, it returns -1 to indicate that the symbol is
     // not in the symbol table.
-
-    public int getSymbolIndex(String symbol) {
-        for (int i = 0; i < symbolTab.size(); i++) {
-            if (symbolTab.get(i)[0].equals(symbol)) {
+    public static int getSymPosition(String symbol) {
+        for (int i = 0; i < symbolTable.size(); i++) {
+            if (symbolTable.get(i)[0].equals(symbol)) {
                 return i;
             }
         }
         return -1;
     }
 
-    public void process() {
+    public static void process() {
         try (BufferedReader br = new BufferedReader(
                 new FileReader("/Users/piyushagarwal/Downloads/Piyush/TE-SEM1/LP1/Assembler/input.txt"))) {
-
             String line;
-            while (true) {
+            while ((line = br.readLine()) != null) { // Read a line from the input file
+                                                     // readLine() automatically moves to the next line after execution
 
-                // Read a line from the input file
-                line = br.readLine(); // readLine() automatically moves to the next line after execution
-                if (line == null) {
-                    break;
+                // Split the line into words (separated by spaces)
+                String[] words = line.split("\\s+");
+
+                // If the line includes START
+                if (words[1].equals("START")) {
+                    lc = Integer.parseInt(words[2]); // Set the location counter to the value provided in the input
+                                                     // file
+                    System.out.println("(AD,01)\t" + "(C, " + lc + ")");
                 }
 
-                String words[] = line.split("\\s+");
-                // trim() removes leading and trailing spaces
-                // split("\\s+") splits the string at one or more spaces
+                // If the line includes DS
+                if (words[1].equals("DS")) {
+                    int constant = Integer.parseInt(words[2]); // Get the value of the constant
+                    lc += constant; // Increment the location counter by the value of the
+                                    // constant
+                    System.out.println("(DS,02)\t" + "(C, " + constant + ")");
+                }
 
-                System.out.println(words.length);
+                // If the line includes DC
+                if (words[1].equals("DC")) {
+                    lc++;
+                    int constant = Integer.parseInt(words[2].replace("'", "")); // Get the value of the constant
+                    System.out.println("(DS,01)\t" + "(C, " + constant + ")");
+                }
 
-                // Print the words array
-                for (String word : words) {
-                    if (word.equals("")) {
-                        System.out.println("Empty String");
-                    } else {
-                        System.out.println(word);
+                // If the line includes a symbol/label
+                if (!words[0].equals("")) {
+                    String[] pair = { words[0], Integer.toString(lc) };
+                    updateSymtab(pair);
+                }
+
+                // If the line includes ORIGIN
+                if (words[1].equals("ORIGIN")) {
+                    String opreations[] = words[2].split("\\+");
+                    int symbolIndex = getSymPosition(opreations[0]);
+                    lc = Integer.parseInt(symbolTable.get(symbolIndex)[1]) + Integer.parseInt(opreations[1]);
+                }
+
+                // If the line includes EQU
+                if (words[1].equals("EQU")) {
+                    String opreations[] = words[2].split("\\+");
+                    int symbolIndex = getSymPosition(opreations[0]); // Get the index of the symbol in the symbol table
+                    int symbolLC = Integer.parseInt(symbolTable.get(symbolIndex)[1]); // Get the location counter
+                    int updatedLC = symbolLC + Integer.parseInt(opreations[1]); // Update the location counter
+                    symbolTable.get(symbolIndex)[1] = Integer.toString(updatedLC); // Update the symbol table
+                    System.out.println("(AD,04)\t");
+
+                }
+
+                // If the line includes LTORG
+                if (words[1].equals("LTORG")) {
+                    for (int i = poolIndex; i < literalIndex; i++) {
+                        literalTable.get(i)[1] = Integer.toString(lc);
+                        lc++;
+
+                        int literalValue = Integer.parseInt(literalTable.get(i)[0].replace("=", "").replace("'", ""));
+                        System.out.println("(AD, 05)\t(DL,01)\t(C, " + literalValue + ")");
                     }
+
+                    // Update Pool Table
+                    poolTable.add(literalIndex);
+                    poolIndex = literalIndex;
+                }
+
+                // If the line includes OPCODE
+                if (OPTAB.containsKey(words[1])) {
+                    String code = OPTAB.get(words[1]) + "\t";
+
+                    int j = 2;
+                    while (j < words.length) {
+                        String word = words[j].replace(",", "");
+
+                        // If the word is a Register
+                        if (REG.containsKey(word)) {
+                            code += REG.get(word) + "\t";
+                        } else if (CC.containsKey(word)) {
+                            code += CC.get(word) + "\t";
+                        } else if (word.contains("=")) {
+                            String[] pair = { word, "-1" };
+                            literalTable.add(pair);
+                            code += "(L, " + literalIndex + ")";
+                            literalIndex++;
+                        } else {
+                            if (getSymPosition(word) == -1) {
+                                String[] pair = { word, "-1" };
+                                symbolTable.add(pair);
+                            }
+
+                            int symbolIndex = getSymPosition(word);
+                            code += "(S," + symbolIndex + ")";
+                        }
+
+                        j++;
+                    }
+
+                    lc++;
+                    System.out.println(code);
+                }
+
+                // If the line includes END
+                if (words[1].equals("END")) {
+                    for (int i = poolIndex; i < literalIndex; i++) {
+                        literalTable.get(i)[1] = Integer.toString(lc);
+                        lc++;
+
+                    }
+
+                    // Update Pool Table
+                    poolTable.add(literalIndex);
+                    poolIndex = literalIndex;
+
+                    System.out.println("(AD, 02)");
                 }
 
             }
 
-        } catch (FileNotFoundException e) { // Catch block for BufferedReader
-            System.out.println(e);
-        } catch (IOException e) { // Catch block for readLine()
-            System.out.println(e);
-        } catch (Exception e) { // Catch block for general exceptions
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
 
     public static void main(String args[]) {
-        // // Tests to write all the functions
+        poolTable.add(0);// Add the first entry to the pool table
 
-        // // Test updateSymbolTab
-        Pass1 pass1 = new Pass1();
-        // String[] pair = { "A", "5" };
-        // pass1.symbolTab.add(pair);
-        // String[] pair2 = { "B", "10" };
-        // pass1.symbolTab.add(pair2);
-        // String[] pair3 = { "C", "15" };
-        // pass1.symbolTab.add(pair3);
-        // String[] pair4 = { "D", "20" };
-        // pass1.symbolTab.add(pair4);
-        // String[] pair5 = { "E", "25" };
-        // pass1.symbolTab.add(pair5);
+        process();
 
-        // // Test getSymbolLC
-        // System.out.println(pass1.getSymbolLC("G"));
+        System.out.println();
+        // Print symbol table
+        System.out.println("Symbol Table: ");
+        for (String[] i : symbolTable) {
+            System.out.println(i[0] + "\t" + i[1]);
+        }
 
-        // // Test getSymbolIndex
-        // System.out.println(pass1.getSymbolIndex("A"));
+        System.out.println();
+        // Print literal table
+        System.out.println("Literal Table: ");
+        for (String[] i : literalTable) {
+            System.out.println(i[0] + "\t" + i[1]);
+        }
 
-        pass1.process();
+        System.out.println();
+        // Print pool table
+        System.out.println("Pool Table: ");
+        for (int i : poolTable) {
+            System.out.println(i);
+        }
 
     }
 
