@@ -7,26 +7,24 @@ import java.io.IOException;
 public class Pass1 {
     private int positionalParameterCount;
     private int keywordParameterCount;
-    private int macroCounter;
     private String macroNameTable;
     private String parameterNameTable;
     private String macroDefinitionTable;
     private String keywordParameterDefaultTable;
     private int macroDefinitionTablePointer;
     private int keywordParameterTablePointer;
-    private String instructionCounter;
+    private String instruction;
 
     public Pass1() {
         this.positionalParameterCount = 0;
         this.keywordParameterCount = 0;
-        this.macroCounter = 0;
         this.macroNameTable = "";
         this.parameterNameTable = "";
         this.macroDefinitionTable = "";
         this.keywordParameterDefaultTable = "";
         this.macroDefinitionTablePointer = 1;
         this.keywordParameterTablePointer = 1;
-        this.instructionCounter = "";
+        this.instruction = "";
     }
 
     public void process() {
@@ -39,13 +37,12 @@ public class Pass1 {
             while ((line = file.readLine()) != null) { // readLine() automatically moves to the next line after
                                                        // execution
                 if (line.contains("START") || isCodeStart) {
-                    instructionCounter += line;
-                    instructionCounter += "\n";
+                    instruction += line;
+                    instruction += "\n";
                     isCodeStart = true;
                 } else {
                     String[] words = line.replace("&", "").replace(",", "").split("\\s+");
                     if ("MACRO".equals(words[0])) {
-                        macroCounter++;
                         isMacroPending = true;
                     } else if (isMacroPending) {
                         positionalParameterCount = 0;
@@ -75,7 +72,7 @@ public class Pass1 {
                         isMacroPending = false;
                     } else {
                         String expandedCode = words[0] + "\t";
-                        String[] parameters = parameterNameTable.split("\n")[macroCounter - 1].split("\\s+");
+                        String[] parameters = parameterNameTable.split("\\s+");
 
                         for (int i = 1; i < words.length; i++) {
                             if (words[i].contains("=")) {
@@ -108,7 +105,7 @@ public class Pass1 {
             System.out.println("*" + "Keyword Parameter Default Table (KPDT)" + "*");
             System.out.println(keywordParameterDefaultTable);
             System.out.println("*" + "Instruction Counter (IC)" + "*");
-            System.out.println(instructionCounter);
+            System.out.println(instruction);
 
         } catch (IOException e) {
             e.printStackTrace();
