@@ -10,17 +10,17 @@ class Pass1 {
     // Note that we have to create a block to insert or do any operation on the Maps
     static HashMap<String, String> OPTAB = new HashMap<>() { // Create OPCODE table
         {
-            put("STOP", "(IS,00)");
-            put("ADD", "(IS,01)");
-            put("SUB", "(IS,02)");
-            put("MUL", "(IS,03)");
-            put("MOVER", "(IS,04)");
-            put("MOVEM", "(IS,05)");
-            put("COMP", "(IS,06)");
-            put("BC", "(IS,07)");
-            put("DIV", "(IS,08)");
-            put("READ", "(IS,09)");
-            put("PRINT", "(IS,10)");
+            put("STOP", "(IS, 00)");
+            put("ADD", "(IS, 01)");
+            put("SUB", "(IS, 02)");
+            put("MUL", "(IS, 03)");
+            put("MOVER", "(IS, 04)");
+            put("MOVEM", "(IS, 05)");
+            put("COMP", "(IS, 06)");
+            put("BC", "(IS, 07)");
+            put("DIV", "(IS, 08)");
+            put("READ", "(IS, 09)");
+            put("PRINT", "(IS, 10)");
         }
     };
 
@@ -110,7 +110,7 @@ class Pass1 {
                 if (words[1].equals("START")) {
                     lc = Integer.parseInt(words[2]); // Set the location counter to the value provided in the input
                                                      // file
-                    System.out.println("(AD,01)\t" + "(C, " + lc + ")");
+                    System.out.println("(AD, 01)\t" + "(C, " + lc + ")");
                 }
 
                 // If the line includes DS
@@ -118,14 +118,14 @@ class Pass1 {
                     int constant = Integer.parseInt(words[2]); // Get the value of the constant
                     lc += constant; // Increment the location counter by the value of the
                                     // constant
-                    System.out.println("(DS,02)\t" + "(C, " + constant + ")");
+                    System.out.println("(DS, 02)\t" + "(C, " + constant + ")");
                 }
 
                 // If the line includes DC
                 if (words[1].equals("DC")) {
                     lc++;
                     int constant = Integer.parseInt(words[2].replace("'", "")); // Get the value of the constant
-                    System.out.println("(DS,01)\t" + "(C, " + constant + ")");
+                    System.out.println("(DS, 01)\t" + "(C, " + constant + ")");
                 }
 
                 // If the line includes a symbol/label
@@ -139,6 +139,7 @@ class Pass1 {
                     String opreations[] = words[2].split("\\+");
                     int symbolIndex = getSymPosition(opreations[0]);
                     lc = Integer.parseInt(symbolTable.get(symbolIndex)[1]) + Integer.parseInt(opreations[1]);
+                    System.out.println("(AD, 03)\t" + "(C, " + lc + ")");
                 }
 
                 // If the line includes EQU
@@ -148,7 +149,7 @@ class Pass1 {
                     int symbolLC = Integer.parseInt(symbolTable.get(symbolIndex)[1]); // Get the location counter
                     int updatedLC = symbolLC + Integer.parseInt(opreations[1]); // Update the location counter
                     symbolTable.get(symbolIndex)[1] = Integer.toString(updatedLC); // Update the symbol table
-                    System.out.println("(AD,04)\t");
+                    System.out.println("(AD, 04)\t");
 
                 }
 
@@ -192,7 +193,7 @@ class Pass1 {
                             }
 
                             int symbolIndex = getSymPosition(word);
-                            code += "(S," + symbolIndex + ")";
+                            code += "(S, " + symbolIndex + ")";
                         }
 
                         j++;
