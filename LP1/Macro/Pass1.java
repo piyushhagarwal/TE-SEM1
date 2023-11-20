@@ -3,6 +3,7 @@ package LP1.Macro;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Pass1 {
     private int positionalParameterCount;
@@ -14,6 +15,7 @@ public class Pass1 {
     private int macroDefinitionTablePointer;
     private int keywordParameterTablePointer;
     private String instruction;
+    private int macroCount;
 
     public Pass1() {
         this.positionalParameterCount = 0;
@@ -25,6 +27,7 @@ public class Pass1 {
         this.macroDefinitionTablePointer = 1;
         this.keywordParameterTablePointer = 1;
         this.instruction = "";
+        this.macroCount = 0;
     }
 
     public void process() {
@@ -44,6 +47,7 @@ public class Pass1 {
                     String[] words = line.replace("&", "").replace(",", "").split("\\s+");
                     if ("MACRO".equals(words[0])) {
                         isMacroPending = true;
+                        macroCount++;
                     } else if (isMacroPending) {
                         positionalParameterCount = 0;
                         keywordParameterCount = 0;
@@ -72,7 +76,7 @@ public class Pass1 {
                         isMacroPending = false;
                     } else {
                         String expandedCode = words[0] + "\t";
-                        String[] parameters = parameterNameTable.split("\\s+");
+                        String[] parameters = parameterNameTable.split("\n")[macroCount - 1].split("\\s+");
 
                         for (int i = 1; i < words.length; i++) {
                             if (words[i].contains("=")) {
